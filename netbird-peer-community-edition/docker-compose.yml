@@ -61,11 +61,11 @@ services:
         done
     volumes:
       - ${APP_DATA_DIR}/data/app_data:/var/lib/netbird:ro
-      - ${APP_DATA_DIR}/data/status:/status
+      - ${APP_DATA_DIR}/data/www/status:/status
 
+  # status/ lives inside www, a nested mount into the read-only www mount fails
   web:
     image: nginx:1.27@sha256:124b44bfc9ccd1f3cedf4b592d4d1e8bddb78b51ec2ed5056c52d3692baebc19
     restart: on-failure
     volumes:
       - ${APP_DATA_DIR}/data/www:/usr/share/nginx/html:ro
-      - ${APP_DATA_DIR}/data/status:/usr/share/nginx/html/status:ro
