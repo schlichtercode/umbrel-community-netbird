@@ -1,0 +1,32 @@
+manifestVersion: 1
+id: schlicht-netbird
+name: NetBird (Kernel)
+tagline: NetBird client with a real WireGuard interface and routes on the host
+icon: https://getumbrel.github.io/umbrel-apps-gallery/netbird/icon.svg
+category: networking
+version: "0.81.3"
+port: 8478
+description: >-
+  NetBird client for umbrelOS that runs as root with host networking and a real
+  wt0 interface (kernel WireGuard when available). Unlike the official app, which
+  uses the rootless netstack image, this lets the Umbrel itself reach NetBird
+  networks, routes and exit nodes.
+
+
+  Works with NetBird Cloud and self-hosted management servers. Register the
+  device with a setup key by placing a setup.env file in the app's data folder
+  (see the README of this app store). The web interface shows the live
+  connection status.
+developer: NetBird
+website: https://netbird.io/
+submitter: schlicht
+submission: ""
+repo: https://github.com/netbirdio/netbird
+support: https://github.com/netbirdio/netbird/issues
+gallery: []
+releaseNotes: >-
+  NetBird 0.81.3 in kernel mode.
+dependencies: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""

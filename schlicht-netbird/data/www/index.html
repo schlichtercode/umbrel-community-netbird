@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetBird Status</title>
+  <link rel="icon" href="favicon.svg">
+  <style>
+    :root {
+      --bg: #181a1d;
+      --card: #222429;
+      --border: #33363c;
+      --text: #f2f2f2;
+      --muted: #9a9ca3;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --accent: #f68330;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 32px 16px; }
+    header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    header img { width: 56px; height: 56px; border-radius: 12px; }
+    h1 { font-size: 24px; margin: 0; }
+    h2 { font-size: 16px; margin: 0 0 12px; color: var(--muted); font-weight: 500; }
+    .sub { color: var(--muted); font-size: 13px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .label { color: var(--muted); font-size: 13px; }
+    .value { font-size: 18px; font-weight: 600; margin-top: 4px; word-break: break-all; }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 500; font-size: 13px; }
+    .table-wrap { overflow-x: auto; }
+    pre { background: #111214; border: 1px solid var(--border); border-radius: 8px; padding: 12px; overflow-x: auto; font-size: 13px; }
+    code { color: var(--accent); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="favicon.svg" alt="">
+    <div>
+      <h1>NetBird (Kernel)</h1>
+      <div class="sub" id="updated">Lade Status …</div>
+    </div>
+  </header>
+
+  <section id="connected" class="hidden">
+    <div class="grid">
+      <div class="card"><div class="label">Management</div><div class="value" id="mgmt"></div></div>
+      <div class="card"><div class="label">Signal</div><div class="value" id="signal"></div></div>
+      <div class="card"><div class="label">NetBird IP</div><div class="value" id="ip"></div></div>
+      <div class="card"><div class="label">Interface</div><div class="value" id="iface"></div></div>
+      <div class="card"><div class="label">Peers</div><div class="value" id="peers"></div></div>
+      <div class="card"><div class="label">Relays</div><div class="value" id="relays"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:24px">
+      <h2>Peer</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>IP</th><th>Status</th><th>Verbindung</th></tr></thead>
+          <tbody id="peer-rows"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Aktive Netzwerke</h2>
+      <div id="networks"></div>
+    </div>
+  </section>
+
+  <section id="setup" class="hidden">
+    <div class="card">
+      <h2 class="warn" id="setup-title">Nicht verbunden</h2>
+      <p>Status des Daemons: <strong id="daemon-status"></strong></p>
+      <p>Um dieses Gerät mit einem Setup-Key zu registrieren, lege per SSH eine Datei
+        <code>setup.env</code> im Datenordner der App an und starte die App neu:</p>
+<pre>sudo tee ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env &gt;/dev/null &lt;&lt;'EOF'
+NB_MANAGEMENT_URL=https://dein-management-server
+NB_SETUP_KEY=DEIN-SETUP-KEY
+EOF
+sudo chmod 600 ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env</pre>
+      <p>Nach erfolgreicher Registrierung kann die Datei wieder gelöscht werden.
+        Ohne <code>setup.env</code> wartet NetBird auf einen SSO-Login; der Link dazu steht in den App-Logs
+        (Rechtsklick auf die App → Troubleshoot).</p>
+      <pre id="error" class="hidden"></pre>
+    </div>
+  </section>
+</main>
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function state(el, text, cls) {
+    el.textContent = text;
+    el.className = 'value ' + cls;
+  }
+
+  function render(s, errorText) {
+    const connected = s.management && s.management.connected;
+    $('connected').classList.toggle('hidden', !connected);
+    $('setup').classList.toggle('hidden', connected);
+
+    if (!connected) {
+      $('daemon-status').textContent = s.daemonStatus || 'unbekannt';
+      const err = (errorText || '').trim() || (s.management && s.management.error) || '';
+      $('error').textContent = err;
+      $('error').classList.toggle('hidden', !err);
+      return;
+    }
+
+    state($('mgmt'), 'Verbunden', 'ok');
+    state($('signal'), s.signal.connected ? 'Verbunden' : 'Getrennt', s.signal.connected ? 'ok' : 'bad');
+    $('ip').textContent = (s.netbirdIp || '–').split('/')[0];
+    state($('iface'), s.usesKernelInterface ? 'Kernel (wt0)' : 'Userspace', s.usesKernelInterface ? 'ok' : 'warn');
+    const p = s.peers || { total: 0, connected: 0, details: [] };
+    state($('peers'), p.connected + ' / ' + p.total, p.connected === p.total ? 'ok' : 'warn');
+    const r = s.relays || { total: 0, available: 0 };
+    state($('relays'), r.available + ' / ' + r.total, r.available === r.total ? 'ok' : 'warn');
+
+    const rows = $('peer-rows');
+    rows.replaceChildren();
+    for (const peer of p.details || []) {
+      const tr = document.createElement('tr');
+      const isUp = peer.status === 'Connected';
+      const cells = [
+        peer.fqdn.split('.')[0],
+        peer.netbirdIp,
+        isUp ? 'Verbunden' : peer.status,
+        isUp ? peer.connectionType : '–',
+      ];
+      cells.forEach((text, i) => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        if (i === 2) td.className = isUp ? 'ok' : 'warn';
+        tr.appendChild(td);
+      });
+      rows.appendChild(tr);
+    }
+
+    const nets = s.networks || [];
+    $('networks').textContent = nets.length ? nets.join(', ') : 'Keine';
+  }
+
+  async function refresh() {
+    try {
+      const res = await fetch('status/status.json?t=' + Date.now(), { cache: 'no-store' });
+      const s = await res.json();
+      let errorText = '';
+      if (!(s.management && s.management.connected)) {
+        const e = await fetch('status/error.txt?t=' + Date.now(), { cache: 'no-store' });
+        if (e.ok) errorText = await e.text();
+      }
+      render(s, errorText);
+      $('updated').textContent = 'Aktualisiert: ' + new Date().toLocaleTimeString('de-DE');
+    } catch (e) {
+      $('updated').textContent = 'Status noch nicht verfügbar – NetBird startet …';
+    }
+  }
+
+  refresh();
+  setInterval(refresh, 10000);
+</script>
+</body>
+</html>
