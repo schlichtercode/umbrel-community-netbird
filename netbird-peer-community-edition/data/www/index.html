@@ -53,7 +53,7 @@
   <header>
     <img src="favicon.svg" alt="">
     <div>
-      <h1>NetBird (Kernel)</h1>
+      <h1>NetBird Peer – Community Edition</h1>
       <div class="sub" id="updated">Lade Status …</div>
     </div>
   </header>
@@ -88,11 +88,11 @@
       <p>Status des Daemons: <strong id="daemon-status"></strong></p>
       <p>Um dieses Gerät mit einem Setup-Key zu registrieren, lege per SSH eine Datei
         <code>setup.env</code> im Datenordner der App an und starte die App neu:</p>
-<pre>sudo tee ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env &gt;/dev/null &lt;&lt;'EOF'
+<pre>sudo tee ~/umbrel/app-data/netbird-peer-community-edition/data/app_data/setup.env &gt;/dev/null &lt;&lt;'EOF'
 NB_MANAGEMENT_URL=https://dein-management-server
 NB_SETUP_KEY=DEIN-SETUP-KEY
 EOF
-sudo chmod 600 ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env</pre>
+sudo chmod 600 ~/umbrel/app-data/netbird-peer-community-edition/data/app_data/setup.env</pre>
       <p>Nach erfolgreicher Registrierung kann die Datei wieder gelöscht werden.
         Ohne <code>setup.env</code> wartet NetBird auf einen SSO-Login; der Link dazu steht in den App-Logs
         (Rechtsklick auf die App → Troubleshoot).</p>

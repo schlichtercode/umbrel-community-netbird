@@ -3,7 +3,7 @@ version: "3.7"
 services:
   app_proxy:
     environment:
-      APP_HOST: schlicht-netbird_web_1
+      APP_HOST: netbird-peer-community-edition_web_1
       APP_PORT: 80
 
   # NetBird daemon as root with a real wt0 interface (no netstack mode).

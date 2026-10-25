@@ -1,10 +1,10 @@
-# Schlicht – Umbrel Community App Store
+# NetBird Peer Community – Umbrel Community App Store
 
 Eigener App Store für umbrelOS. Enthält aktuell eine App:
 
 | App | ID | Zweck |
 |---|---|---|
-| NetBird (Kernel) | `schlicht-netbird` | NetBird-Client mit echtem `wt0`-Interface und Routen auf dem Host |
+| NetBird Peer – Community Edition | `netbird-peer-community-edition` | NetBird-Client mit echtem `wt0`-Interface und Routen auf dem Host |
 
 ## Warum nicht die offizielle NetBird-App?
 
@@ -14,7 +14,7 @@ Routen im Host. Andere Peers erreichen den Umbrel, aber der Umbrel selbst kann k
 NetBird-Netzwerke, Routen oder Exit-Nodes nutzen. Außerdem gibt es keine Möglichkeit,
 Management-URL oder Setup-Key einzutragen.
 
-`schlicht-netbird` nutzt das normale Image als root mit `/dev/net/tun`, Host-Netzwerk und
+`netbird-peer-community-edition` nutzt das normale Image als root mit `/dev/net/tun`, Host-Netzwerk und
 Kernel-WireGuard (falls vorhanden). Pfade für Config und Socket sind dieselben wie in der
 offiziellen App, deshalb lässt sich deren `config.json` direkt übernehmen.
 
@@ -32,7 +32,7 @@ Die Weboberfläche zeigt den Live-Status (`netbird status --json`, alle 10 Sekun
 1. Das Repo muss öffentlich sein, damit Umbrel es ohne Zugangsdaten klonen kann.
 2. In Umbrel: **App Store** → Menü „…“ oben rechts → **Community App Stores** →
    `https://github.com/schlichtercode/umbrel-community-netbird` einfügen → **Add**.
-3. Im neuen Store „Schlicht“ erscheint **NetBird (Kernel)**.
+3. Im neuen Store „NetBird Peer Community“ erscheint **NetBird Peer – Community Edition**.
 
 ## Umzug von der offiziellen NetBird-App
 
@@ -46,13 +46,13 @@ sudo cp -a ~/umbrel/app-data/netbird/data/app_data/config.json ~/netbird-config-
 
 2. Offizielle **NetBird**-App in Umbrel deinstallieren. Dabei wird ihr Datenordner gelöscht,
    deshalb vorher Schritt 1.
-3. **NetBird (Kernel)** aus dem Store „Schlicht“ installieren. Die App startet ohne
+3. **NetBird Peer – Community Edition** aus dem Store „NetBird Peer Community“ installieren. Die App startet ohne
    Registrierung und wartet auf einen SSO-Login – den Link **nicht** öffnen.
 
 ```sh
 # 4. App stoppen, frisch angelegte Dateien beiseitelegen, Backup einspielen
-sudo docker stop schlicht-netbird_app_1
-cd ~/umbrel/app-data/schlicht-netbird/data
+sudo docker stop netbird-peer-community-edition_app_1
+cd ~/umbrel/app-data/netbird-peer-community-edition/data
 sudo mkdir -p fresh-leftovers
 sudo find app_data -mindepth 1 -maxdepth 1 ! -name .gitkeep -exec mv -t fresh-leftovers {} +
 sudo cp -a ~/netbird-config-backup.json app_data/config.json
@@ -61,7 +61,7 @@ sudo cp -a ~/netbird-config-backup.json app_data/config.json
 5. App in Umbrel neu starten (Rechtsklick → **Restart**) und prüfen:
 
 ```sh
-sudo docker exec schlicht-netbird_app_1 netbird status
+sudo docker exec netbird-peer-community-edition_app_1 netbird status
 ip -br link | grep wt
 ```
 
@@ -72,7 +72,7 @@ und ein `wt0`-Interface. Danach können `~/netbird-config-backup.json` und
 Praktischer Alias für `~/.bashrc`:
 
 ```sh
-alias netbird='sudo docker exec -it schlicht-netbird_app_1 netbird'
+alias netbird='sudo docker exec -it netbird-peer-community-edition_app_1 netbird'
 ```
 
 ## Neues Gerät mit Setup-Key registrieren
@@ -80,11 +80,11 @@ alias netbird='sudo docker exec -it schlicht-netbird_app_1 netbird'
 Vor oder nach der Installation eine `setup.env` im Datenordner anlegen und die App neu starten:
 
 ```sh
-sudo tee ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env >/dev/null <<'EOF'
+sudo tee ~/umbrel/app-data/netbird-peer-community-edition/data/app_data/setup.env >/dev/null <<'EOF'
 NB_MANAGEMENT_URL=https://vpn.example.com
 NB_SETUP_KEY=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
 EOF
-sudo chmod 600 ~/umbrel/app-data/schlicht-netbird/data/app_data/setup.env
+sudo chmod 600 ~/umbrel/app-data/netbird-peer-community-edition/data/app_data/setup.env
 ```
 
 Für NetBird Cloud `NB_MANAGEMENT_URL` weglassen. Nach erfolgreicher Registrierung die
@@ -105,9 +105,9 @@ Ohne `setup.env` wartet NetBird auf einen SSO-Login. Der Link steht in den App-L
      "https://ghcr.io/v2/netbirdio/netbird/manifests/$V" | grep -i docker-content-digest
    ```
 
-2. In `schlicht-netbird/docker-compose.yml` Tag und Digest bei **beiden** Services
+2. In `netbird-peer-community-edition/docker-compose.yml` Tag und Digest bei **beiden** Services
    (`app` und `status`) ersetzen.
-3. In `schlicht-netbird/umbrel-app.yml` `version` und `releaseNotes` anpassen.
+3. In `netbird-peer-community-edition/umbrel-app.yml` `version` und `releaseNotes` anpassen.
 4. Committen und pushen. Umbrel zeigt das Update im Store an.
 
 ## Hinweise

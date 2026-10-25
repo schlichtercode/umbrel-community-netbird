@@ -1,6 +1,6 @@
 manifestVersion: 1
-id: schlicht-netbird
-name: NetBird (Kernel)
+id: netbird-peer-community-edition
+name: NetBird Peer – Community Edition
 tagline: NetBird client with a real WireGuard interface and routes on the host
 icon: https://getumbrel.github.io/umbrel-apps-gallery/netbird/icon.svg
 category: networking
@@ -19,7 +19,7 @@ description: >-
   connection status.
 developer: NetBird
 website: https://netbird.io/
-submitter: schlicht
+submitter: schlichtercode
 submission: ""
 repo: https://github.com/netbirdio/netbird
 support: https://github.com/netbirdio/netbird/issues
