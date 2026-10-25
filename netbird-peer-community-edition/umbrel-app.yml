@@ -20,9 +20,9 @@ description: >-
 developer: NetBird
 website: https://netbird.io/
 submitter: schlichtercode
-submission: ""
+submission: https://github.com/schlichtercode/umbrel-community-netbird
 repo: https://github.com/netbirdio/netbird
-support: https://github.com/netbirdio/netbird/issues
+support: https://github.com/schlichtercode/umbrel-community-netbird/issues
 gallery: []
 releaseNotes: >-
   NetBird 0.81.3 in kernel mode.
